@@ -52,6 +52,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     } elseif (!is_logged_in()) {
         $error = 'Please log in.';
+    } elseif ($action === 'password') {
+        $current = (string)($_POST['current_password'] ?? '');
+        $next = (string)($_POST['new_password'] ?? '');
+        $again = (string)($_POST['confirm_password'] ?? '');
+        $hash = site_config()['password_hash'];
+        if (login_blocked()) {
+            $error = 'Too many tries. Wait ten minutes and try again.';
+        } elseif ($hash === '' || $hash[0] !== '$' || !password_verify($current, $hash)) {
+            login_note_failure();
+            $error = login_blocked()
+                ? 'Too many tries. Wait ten minutes and try again.'
+                : 'The current password is not correct.';
+        } elseif (strlen($next) < 8) {
+            $error = 'Use at least 8 characters for the new password.';
+        } elseif ($next !== $again) {
+            $error = 'The new passwords do not match.';
+        } elseif ($next === $current) {
+            $error = 'Choose a password that is different from the current one.';
+        } else {
+            $config = site_config();
+            $config['password_hash'] = password_hash($next, PASSWORD_DEFAULT);
+            if (!save_site_config($config)) {
+                $error = 'Could not save the password. Make sure data/config.php is writable.';
+            } else {
+                session_regenerate_id(true);
+                login_note_success();
+                $_SESSION['flash'] = 'Password updated. Use it the next time you sign in.';
+                header('Location: ' . admin_self('view=password'));
+                exit;
+            }
+        }
     } elseif ($action === 'save') {
         $form['id'] = (string)($_POST['id'] ?? '');
         $form['title'] = clip((string)($_POST['title'] ?? ''), 140);
@@ -138,7 +169,7 @@ if ($error === '' && isset($_GET['edit']) && preg_match('/^[a-f0-9]{16}$/', (str
 }
 
 $view = (string)($_GET['view'] ?? 'events');
-if ($view !== 'enquiries') {
+if (!in_array($view, ['events', 'enquiries', 'password'], true)) {
     $view = 'events';
 }
 
@@ -193,9 +224,18 @@ $today = today_string();
     <nav class="admin-nav">
       <a href="<?= h(admin_self()) ?>"<?= $view === 'events' ? ' aria-current="page"' : '' ?>>Events</a>
       <a href="<?= h(admin_self('view=enquiries')) ?>"<?= $view === 'enquiries' ? ' aria-current="page"' : '' ?>>Enquiries</a>
+      <a href="<?= h(admin_self('view=password')) ?>"<?= $view === 'password' ? ' aria-current="page"' : '' ?>>Password</a>
       <a href="../index.php">View site</a>
     </nav>
-    <h1><?= $view === 'enquiries' ? 'Enquiries' : 'Events' ?></h1>
+    <h1><?php
+      if ($view === 'enquiries') {
+          echo 'Enquiries';
+      } elseif ($view === 'password') {
+          echo 'Password';
+      } else {
+          echo 'Events';
+      }
+    ?></h1>
     <?php if ($flash !== ''): ?><p class="notice" role="status"><?= h($flash) ?></p><?php endif; ?>
     <?php if ($error !== ''): ?><p class="alert" role="alert"><?= h($error) ?></p><?php endif; ?>
 
@@ -248,6 +288,25 @@ $today = today_string();
         </article>
       <?php endforeach; ?>
       </section>
+    <?php elseif ($view === 'password'): ?>
+      <form class="admin-card" method="post" action="<?= h(admin_self('view=password')) ?>">
+        <?= csrf_field() ?>
+        <input type="hidden" name="action" value="password">
+        <h2>Change password</h2>
+        <label for="current-password">Current password
+          <input id="current-password" name="current_password" type="password" required autocomplete="current-password">
+        </label>
+        <label for="new-password">New password
+          <input id="new-password" name="new_password" type="password" required minlength="8" autocomplete="new-password">
+        </label>
+        <label for="confirm-password">New password again
+          <input id="confirm-password" name="confirm_password" type="password" required minlength="8" autocomplete="new-password">
+        </label>
+        <div class="admin-actions">
+          <button class="btn btn-gold" type="submit">Update password</button>
+        </div>
+        <p class="quiet">Use at least 8 characters. You stay signed in. The new password is used the next time you sign in.</p>
+      </form>
     <?php else: ?>
       <div class="admin-desk">
       <form class="admin-card" method="post" action="<?= h(admin_self()) ?>">

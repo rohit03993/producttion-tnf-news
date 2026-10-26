@@ -31,6 +31,47 @@ function public_self(string $query = ''): string
     return $query === '' ? $path : $path . '?' . $query;
 }
 
+function admin_public_path(): string
+{
+    $root = site_root_path();
+    return ($root === '/' ? '' : $root) . '/admin/';
+}
+
+function site_url(string $path = ''): string
+{
+    $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (string)$_SERVER['SERVER_PORT'] === '443')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $root = site_root_path();
+    $base = ($https ? 'https' : 'http') . '://' . $host . ($root === '/' ? '' : $root);
+    if ($path === '') {
+        return $base . '/';
+    }
+    return $base . '/' . ltrim($path, '/');
+}
+
+function save_site_config(array $config): bool
+{
+    $data = [
+        'password_hash' => (string)($config['password_hash'] ?? ''),
+        'whatsapp' => (string)($config['whatsapp'] ?? ''),
+        'timezone' => (string)($config['timezone'] ?? 'Asia/Kolkata'),
+    ];
+    $body = "<?php\n\n"
+        . "if (realpath(__FILE__) === realpath(\$_SERVER['SCRIPT_FILENAME'] ?? '')) {\n"
+        . "    http_response_code(403);\n"
+        . "    exit;\n"
+        . "}\n\n"
+        . 'return ' . var_export($data, true) . ";\n";
+    $path = data_path('config.php');
+    $tmp = $path . '.tmp';
+    if (file_put_contents($tmp, $body, LOCK_EX) === false) {
+        return false;
+    }
+    return rename($tmp, $path);
+}
+
 function start_session(): void
 {
     if (session_status() === PHP_SESSION_ACTIVE) {

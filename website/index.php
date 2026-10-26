@@ -129,8 +129,29 @@ $services = [
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#152033">
-  <title>Anupriya Productions — Event Management &amp; Media Services</title>
-  <meta name="description" content="Anupriya Productions, led by Anupriya Tripathi, hosts weddings, school functions, corporate events, and brand launches.">
+  <?php
+    $shareTitle = 'Anupriya Productions — Event Management & Media Services';
+    $shareText = 'Anupriya Productions, led by Anupriya Tripathi, hosts weddings, school functions, corporate events, and brand launches.';
+    $shareImage = site_url('assets/img/share.jpg');
+  ?>
+  <title><?= h($shareTitle) ?></title>
+  <meta name="description" content="<?= h($shareText) ?>">
+  <link rel="canonical" href="<?= h(site_url()) ?>">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Anupriya Productions">
+  <meta property="og:title" content="<?= h($shareTitle) ?>">
+  <meta property="og:description" content="<?= h($shareText) ?>">
+  <meta property="og:url" content="<?= h(site_url()) ?>">
+  <meta property="og:image" content="<?= h($shareImage) ?>">
+  <meta property="og:image:secure_url" content="<?= h($shareImage) ?>">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Anupriya Productions logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?= h($shareTitle) ?>">
+  <meta name="twitter:description" content="<?= h($shareText) ?>">
+  <meta name="twitter:image" content="<?= h($shareImage) ?>">
   <link rel="icon" href="assets/img/logo-mark.webp" type="image/webp">
   <link rel="preload" as="image" href="assets/img/hero.webp" type="image/webp">
   <link rel="stylesheet" href="assets/css/style.css">
@@ -151,6 +172,7 @@ $services = [
       <a href="#events">Events</a>
       <a href="#gallery">Gallery</a>
       <a href="#book">Book</a>
+      <a href="<?= h(admin_public_path()) ?>">Login</a>
     </nav>
   </header>
 
@@ -310,6 +332,7 @@ $services = [
       <img class="footer-logo" src="assets/img/logo.webp" width="377" height="445" alt="Anupriya Productions, Event Management and Media Services">
       <p class="footer-name">Anupriya Tripathi</p>
       <p>Anchor &amp; Event Host</p>
+      <p><a class="footer-login" href="<?= h(admin_public_path()) ?>">Login</a></p>
     </div>
   </footer>
 

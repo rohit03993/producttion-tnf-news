@@ -519,6 +519,16 @@ textarea {
   font-family: var(--serif);
 }
 
+.footer-login {
+  display: inline-block;
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
 .mobile-bar {
   position: fixed;
   left: 0;
