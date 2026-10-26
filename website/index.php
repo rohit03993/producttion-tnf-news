@@ -139,7 +139,7 @@ function event_cards(array $events, bool $join = false): void
   <?php if ($heroImages): ?>
   <link rel="preload" as="image" href="<?= h($heroImages[0]['file']) ?>">
   <?php endif; ?>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css?v=<?= (int)filemtime(__DIR__ . '/assets/css/style.css') ?>">
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>

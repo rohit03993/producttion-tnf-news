@@ -365,7 +365,7 @@ $site = load_site();
   <meta name="robots" content="noindex">
   <title>Admin — Anupriya Productions</title>
   <link rel="icon" href="../assets/img/logo-mark.webp" type="image/webp">
-  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/style.css?v=<?= (int)filemtime(__DIR__ . '/../assets/css/style.css') ?>">
 </head>
 <body class="admin-body">
   <div class="admin-wrap">
