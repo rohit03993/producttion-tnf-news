@@ -1,3 +1,6 @@
+assets/uploads/*
+!assets/uploads/.htaccess
+data/site.json
 data/config.php
 data/enquiries.json
 data/login.json

@@ -554,10 +554,73 @@ textarea {
   background: var(--ivory);
 }
 
-.admin-wrap {
-  width: min(1080px, calc(100% - 2.5rem));
-  margin: 0 auto;
-  padding: 1.25rem 0 3rem;
+.dash-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.dash-card {
+  display: block;
+  padding: 1.15rem 1.2rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.dash-card strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  font-weight: 500;
+}
+
+.dash-card span {
+  color: var(--muted);
+}
+
+.photo-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.photo-row img {
+  width: 92px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 0.7rem;
+  background: #efe8dc;
+}
+
+.photo-row img.photo-fit {
+  object-fit: contain;
+  background: #f7f4ef;
+}
+
+.photo-row .btn,
+.add-photo .btn {
+  width: auto;
+  justify-self: start;
+}
+
+.add-photo {
+  margin: 0.4rem 0 0.2rem;
+}
+
+.check-line {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.check-line input {
+  width: 1.1rem;
+  min-height: 0;
 }
 
 .admin-body h1 {
@@ -912,10 +975,15 @@ textarea {
     display: none;
   }
 
-  .admin-desk {
+  .admin-desk,
+  .dash-grid {
     grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
     align-items: start;
     gap: 1.5rem;
+  }
+
+  .dash-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 

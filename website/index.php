@@ -68,19 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string)($_POST['action'] ?? '') ==
 $wa = whatsapp_link();
 [$upcoming, $past] = split_events(read_json('events.json'), today_string());
 
-$gallery = [
-    ['file' => 'g-001.webp', 'w' => 798, 'h' => 1000, 'alt' => 'Anupriya Tripathi hosting a wedding, microphone in hand, on a floral stage', 'caption' => 'Wedding', 'wide' => false],
-    ['file' => 'g-016.webp', 'w' => 562, 'h' => 1000, 'alt' => 'Anupriya Tripathi speaking into a microphone in a red gown during a wedding', 'caption' => 'Live hosting', 'wide' => false],
-    ['file' => 'g-007.webp', 'w' => 686, 'h' => 1000, 'alt' => 'Anupriya Tripathi in a black gown in front of a lit stage screen', 'caption' => 'On stage', 'wide' => false],
-    ['file' => 'g-008.webp', 'w' => 679, 'h' => 1000, 'alt' => 'Anupriya Tripathi in a navy gown against a flower wall', 'caption' => 'Celebration', 'wide' => false],
-    ['file' => 'g-011.webp', 'w' => 562, 'h' => 1000, 'alt' => 'Anupriya Tripathi in a red gown on a decorated wedding stage', 'caption' => 'Wedding stage', 'wide' => false],
-    ['file' => 'g-015.webp', 'w' => 750, 'h' => 1000, 'alt' => 'Anupriya Tripathi in a silver lehenga at a reception', 'caption' => 'Reception', 'wide' => false],
-    ['file' => 'g-006.webp', 'w' => 562, 'h' => 1000, 'alt' => 'Anupriya Tripathi at an outdoor haldi celebration', 'caption' => 'Haldi', 'wide' => false],
-    ['file' => 'g-021.webp', 'w' => 450, 'h' => 1000, 'alt' => 'Anupriya Tripathi hosting a school function with a microphone', 'caption' => 'School function', 'wide' => false],
-    ['file' => 'g-022.webp', 'w' => 563, 'h' => 1000, 'alt' => 'Anupriya Tripathi with a media pass at the UP International Trade Show', 'caption' => 'Trade show', 'wide' => false],
-    ['file' => 'g-023.webp', 'w' => 1000, 'h' => 667, 'alt' => 'Anupriya Tripathi speaking at a podium', 'caption' => 'At the podium', 'wide' => true],
-    ['file' => 'g-026.webp', 'w' => 750, 'h' => 1000, 'alt' => 'Anupriya Tripathi at a brand launch', 'caption' => 'Brand launch', 'wide' => false],
-];
+$site = load_site();
+$heroImages = $site['hero_images'];
+$services = $site['services'];
 
 function event_cards(array $events, bool $join = false): void
 {
@@ -115,13 +105,6 @@ function event_cards(array $events, bool $join = false): void
     }
     echo '</div>';
 }
-
-$services = [
-    ['01', 'Weddings', 'Hosting for wedding celebrations, from the haldi to the reception.'],
-    ['02', 'Corporate and trade', 'Conferences, trade shows, and formal programmes.'],
-    ['03', 'School functions', 'Assemblies, annual days, and other school events.'],
-    ['04', 'Brand launches', 'Product launches and in-store activations.'],
-];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -130,15 +113,15 @@ $services = [
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#152033">
   <?php
-    $shareTitle = 'Anupriya Productions — Event Management & Media Services';
-    $shareText = 'Anupriya Productions, led by Anupriya Tripathi, hosts weddings, school functions, corporate events, and brand launches.';
+    $shareTitle = $site['share_title'];
+    $shareText = $site['share_text'];
     $shareImage = site_url('assets/img/share.jpg');
   ?>
   <title><?= h($shareTitle) ?></title>
   <meta name="description" content="<?= h($shareText) ?>">
   <link rel="canonical" href="<?= h(site_url()) ?>">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Anupriya Productions">
+  <meta property="og:site_name" content="<?= h($site['site_name']) ?>">
   <meta property="og:title" content="<?= h($shareTitle) ?>">
   <meta property="og:description" content="<?= h($shareText) ?>">
   <meta property="og:url" content="<?= h(site_url()) ?>">
@@ -152,18 +135,20 @@ $services = [
   <meta name="twitter:title" content="<?= h($shareTitle) ?>">
   <meta name="twitter:description" content="<?= h($shareText) ?>">
   <meta name="twitter:image" content="<?= h($shareImage) ?>">
-  <link rel="icon" href="assets/img/logo-mark.webp" type="image/webp">
-  <link rel="preload" as="image" href="assets/img/hero.webp" type="image/webp">
+  <link rel="icon" href="<?= h($site['logo_mark']['file']) ?>">
+  <?php if ($heroImages): ?>
+  <link rel="preload" as="image" href="<?= h($heroImages[0]['file']) ?>">
+  <?php endif; ?>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body id="top">
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <a class="brand" href="#top">
-      <img src="assets/img/logo-mark.webp" width="168" height="167" alt="">
+      <img src="<?= h($site['logo_mark']['file']) ?>" width="<?= (int)$site['logo_mark']['w'] ?>" height="<?= (int)$site['logo_mark']['h'] ?>" alt="">
       <span>
-        <strong>Anupriya Productions</strong>
-        <small>Event Management &amp; Media Services</small>
+        <strong><?= h($site['site_name']) ?></strong>
+        <small><?= h($site['brand_line']) ?></small>
       </span>
     </a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
@@ -180,32 +165,28 @@ $services = [
     <section class="hero">
       <div class="hero-media">
         <div class="hero-photo">
-          <img class="is-on" src="assets/img/hero.webp" width="1021" height="1280" alt="Anupriya Tripathi hosting a wedding on a floral stage" fetchpriority="high">
-          <img src="assets/img/g-016.webp" width="562" height="1000" alt="Anupriya Tripathi speaking into a microphone in a red gown" loading="lazy" decoding="async">
-          <img src="assets/img/g-008.webp" width="679" height="1000" alt="Anupriya Tripathi in a navy gown against a flower wall" loading="lazy" decoding="async">
-          <img src="assets/img/g-007.webp" width="686" height="1000" alt="Anupriya Tripathi in a black gown on stage" loading="lazy" decoding="async">
-          <img src="assets/img/g-015.webp" width="750" height="1000" alt="Anupriya Tripathi at a reception" loading="lazy" decoding="async">
-          <img src="assets/img/g-022.webp" width="563" height="1000" alt="Anupriya Tripathi at a trade show" loading="lazy" decoding="async">
+          <?php foreach ($heroImages as $index => $photo): ?>
+          <img<?= $index === 0 ? ' class="is-on"' : '' ?> src="<?= h($photo['file']) ?>" width="<?= (int)$photo['w'] ?>" height="<?= (int)$photo['h'] ?>" alt="<?= h($photo['alt']) ?>"<?= $index === 0 ? ' fetchpriority="high"' : ' loading="lazy" decoding="async"' ?>>
+          <?php endforeach; ?>
         </div>
+        <?php if (count($heroImages) > 1): ?>
         <div class="hero-controls">
           <button class="hero-nav hero-prev" type="button" aria-label="Previous photo"></button>
           <div class="hero-dots" aria-label="Photos">
-            <button type="button" class="is-on" aria-label="Photo 1"></button>
-            <button type="button" aria-label="Photo 2"></button>
-            <button type="button" aria-label="Photo 3"></button>
-            <button type="button" aria-label="Photo 4"></button>
-            <button type="button" aria-label="Photo 5"></button>
-            <button type="button" aria-label="Photo 6"></button>
+            <?php foreach ($heroImages as $index => $photo): ?>
+            <button type="button"<?= $index === 0 ? ' class="is-on"' : '' ?> aria-label="Photo <?= $index + 1 ?>"></button>
+            <?php endforeach; ?>
           </div>
           <button class="hero-nav hero-next" type="button" aria-label="Next photo"></button>
         </div>
+        <?php endif; ?>
       </div>
       <div class="hero-copy">
-        <p class="eyebrow">Event Management &amp; Media Services</p>
-        <h1>Anupriya Tripathi</h1>
-        <p class="lede">On the microphone for weddings, school functions, corporate events, and brand launches.</p>
+        <p class="eyebrow"><?= h($site['hero_eyebrow']) ?></p>
+        <h1><?= h($site['hero_title']) ?></h1>
+        <p class="lede"><?= h($site['hero_lede']) ?></p>
         <div class="actions">
-          <a class="btn btn-gold" href="#book">Book an event</a>
+          <a class="btn btn-gold" href="#book"><?= h($site['hero_button']) ?></a>
           <?php if ($wa !== ''): ?>
           <a class="btn btn-line" href="<?= h($wa) ?>" target="_blank" rel="noopener">WhatsApp</a>
           <?php endif; ?>
@@ -215,24 +196,24 @@ $services = [
 
     <section class="section" id="about">
       <div class="wrap about-grid">
-        <img src="assets/img/about.webp" width="781" height="1000" alt="Anupriya Tripathi in a black suit" loading="lazy" decoding="async">
+        <img src="<?= h($site['about_image']['file']) ?>" width="<?= (int)$site['about_image']['w'] ?>" height="<?= (int)$site['about_image']['h'] ?>" alt="<?= h($site['about_image']['alt']) ?>" loading="lazy" decoding="async">
         <div>
-          <h2>About</h2>
-          <p>Anupriya Productions is the event and media work of Anupriya Tripathi. These photographs are from wedding stages, a school function, a trade show where she carried a media pass, and a brand launch.</p>
-          <p>She anchors from the stage and the podium, and she stays with the audience.</p>
+          <h2><?= h($site['about_heading']) ?></h2>
+          <?php if ($site['about_1'] !== ''): ?><p><?= h($site['about_1']) ?></p><?php endif; ?>
+          <?php if ($site['about_2'] !== ''): ?><p><?= h($site['about_2']) ?></p><?php endif; ?>
         </div>
       </div>
     </section>
 
     <section class="section" id="hosting">
       <div class="wrap">
-        <h2>Hosting</h2>
+        <h2><?= h($site['hosting_heading']) ?></h2>
         <div class="services">
-          <?php foreach ($services as $service): ?>
+          <?php foreach ($services as $index => $service): ?>
           <article class="service">
-            <span><?= h($service[0]) ?></span>
-            <h3><?= h($service[1]) ?></h3>
-            <p><?= h($service[2]) ?></p>
+            <span><?= h(sprintf('%02d', $index + 1)) ?></span>
+            <h3><?= h($service['title']) ?></h3>
+            <p><?= h($service['text']) ?></p>
           </article>
           <?php endforeach; ?>
         </div>
@@ -241,7 +222,7 @@ $services = [
 
     <section class="section" id="events">
       <div class="wrap">
-        <h2>Events</h2>
+        <h2><?= h($site['events_heading']) ?></h2>
         <div class="event-cols">
           <div>
             <h3>Upcoming</h3>
@@ -263,12 +244,12 @@ $services = [
 
     <section class="section" id="gallery">
       <div class="wrap">
-        <h2>Gallery</h2>
+        <h2><?= h($site['gallery_heading']) ?></h2>
         <div class="gallery">
-          <?php foreach ($gallery as $photo): ?>
-          <figure class="shot<?= $photo['wide'] ? ' shot-wide' : '' ?>">
-            <img src="assets/img/<?= h($photo['file']) ?>" width="<?= (int)$photo['w'] ?>" height="<?= (int)$photo['h'] ?>" alt="<?= h($photo['alt']) ?>" loading="lazy" decoding="async">
-            <figcaption><?= h($photo['caption']) ?></figcaption>
+          <?php foreach ($site['gallery'] as $photo): ?>
+          <figure class="shot<?= !empty($photo['wide']) ? ' shot-wide' : '' ?>">
+            <img src="<?= h($photo['file']) ?>" width="<?= (int)$photo['w'] ?>" height="<?= (int)$photo['h'] ?>" alt="<?= h($photo['alt']) ?>" loading="lazy" decoding="async">
+            <?php if ($photo['caption'] !== ''): ?><figcaption><?= h($photo['caption']) ?></figcaption><?php endif; ?>
           </figure>
           <?php endforeach; ?>
         </div>
@@ -278,8 +259,8 @@ $services = [
     <section class="section" id="book">
       <div class="wrap">
         <div class="book-panel">
-          <h2>Book an event</h2>
-          <p class="book-lead">Send the date and the kind of programme. The note is saved for Anupriya.</p>
+          <h2><?= h($site['book_title']) ?></h2>
+          <p class="book-lead"><?= h($site['book_lead']) ?></p>
           <?php if ($sent): ?>
           <p class="notice" role="status">Your note is saved.<?php if ($wa !== ''): ?> You can also message on WhatsApp.<?php endif; ?></p>
           <?php endif; ?>
@@ -329,9 +310,9 @@ $services = [
 
   <footer class="site-footer">
     <div class="wrap">
-      <img class="footer-logo" src="assets/img/logo.webp" width="377" height="445" alt="Anupriya Productions, Event Management and Media Services">
-      <p class="footer-name">Anupriya Tripathi</p>
-      <p>Anchor &amp; Event Host</p>
+      <img class="footer-logo" src="<?= h($site['logo']['file']) ?>" width="<?= (int)$site['logo']['w'] ?>" height="<?= (int)$site['logo']['h'] ?>" alt="<?= h($site['logo']['alt']) ?>">
+      <p class="footer-name"><?= h($site['footer_name']) ?></p>
+      <p><?= h($site['footer_line']) ?></p>
       <p><a class="footer-login" href="<?= h(admin_public_path()) ?>">Login</a></p>
     </div>
   </footer>
